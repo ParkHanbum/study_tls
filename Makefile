@@ -54,6 +54,20 @@ all:
 	$(MAKE) preconfig
 	$(MAKE) build
 
+bench-config:
+TARGET := libbenchtls.so bench_main
+
+bench-build: $(TARGET)
+
+libbenchtls.so: bench_tls_so.c
+	gcc -DSHARED $(SO_CFLAGS) $(COMMON_CFLAGS) $^ -o $@
+bench_main: bench_tls_main.c
+	gcc $(TRACE_CFLAGS) $(COMMON_CFLAGS) $^ -o $@ -L. -lbenchtls
+
+bench:
+	$(MAKE) bench-config
+	$(MAKE) bench-build
+
 clean:
 	rm *.so *.so.2
 	rm readtlsinfo
@@ -61,6 +75,7 @@ clean:
 	rm bench_tlsinit
 	rm bench_tlsspec
 	rm bench_hashmap
+	rm libbenchtls bench_main
 	rm dlopen_tls
 	rm dlopen_common
 
